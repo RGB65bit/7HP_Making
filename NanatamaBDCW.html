@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4月24日カウントダウン</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #63aed9;
+    --fg: #ffc547;
+  }
+  *{ box-sizing: border-box; }
+  html, body{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Google Sans", "Helvetica Neue", "Hiragino Sans", "Yu Gothic", sans-serif;
+    overflow-x: hidden;
+  }
+  body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 12vh 4vw 8vh;
+  }
+
+  .main-line{
+    font-family: "Dela Gothic One", "Google Sans", "Hiragino Sans", "Yu Gothic", "Helvetica Neue", sans-serif;
+    text-align: center;
+    font-size: clamp(1.1rem, 3.4vw, 2.1rem);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin-bottom: 5vh;
+  }
+  .main-line .big-num{
+    font-family: "Google Sans", "Helvetica Neue", "Hiragino Sans", "Yu Gothic", sans-serif;
+    font-size: clamp(1.5rem, 5.4vw, 3.2rem);
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .info-panel{
+    font-family: "Google Sans", "Hiragino Sans", "Yu Gothic", "Helvetica Neue", sans-serif;
+    width: min(720px, 92vw);
+    border-top: 1px solid var(--fg);
+    border-bottom: 1px solid var(--fg);
+  }
+
+  .row{
+    display: flex;
+    width: 100%;
+  }
+  .row.top{
+    border-bottom: 1px solid var(--fg);
+  }
+
+  .cell{
+    flex: 1 1 0;
+    padding: 3vh 1vw;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+  }
+  .cell + .cell{
+    border-left: 1px solid var(--fg);
+  }
+
+  .cell .label{
+    font-size: clamp(0.7rem, 1.6vw, 0.95rem);
+    opacity: 0.85;
+    letter-spacing: 0.05em;
+  }
+  .cell .value{
+    font-size: clamp(0.95rem, 2.4vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+  .cell .value.percent{
+    font-size: clamp(1.1rem, 3vw, 1.7rem);
+    font-weight: 800;
+  }
+
+  .progress-wrap{
+    font-family: "Google Sans", "Hiragino Sans", "Yu Gothic", "Helvetica Neue", sans-serif;
+    width: min(720px, 92vw);
+    margin-top: 6vh;
+  }
+  .progress-track{
+    width: 100%;
+    height: 22px;
+    border: 1px solid var(--fg);
+    border-radius: 11px;
+    overflow: hidden;
+    background: transparent;
+    position: relative;
+  }
+  .progress-fill{
+    height: 100%;
+    background: var(--fg);
+    width: 0%;
+    transition: width 0.3s linear;
+  }
+
+  .share-row{
+    width: min(720px, 92vw);
+    margin-top: 4vh;
+    display: flex;
+    gap: 1em;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .share-btn{
+    font-family: "Google Sans", "Hiragino Sans", "Yu Gothic", "Helvetica Neue", sans-serif;
+    font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--fg);
+    border-radius: 999px;
+    padding: 0.7em 1.6em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+  }
+  .share-btn:hover{
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .share-btn:active{
+    transform: scale(0.97);
+  }
+  .share-btn svg{
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+  .share-btn.is-done{
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  @media (max-width: 560px){
+    .row{
+      flex-direction: column;
+    }
+    .cell + .cell{
+      border-left: none;
+      border-top: 1px solid var(--fg);
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="main-line">
+    <span id="targetLabel">珠乃井ナナ今年の誕生日</span>まで<br>
+    あと<span class="big-num" id="secondsLeft">--</span>秒
+  </div>
+
+  <div class="info-panel">
+    <div class="row top">
+      <div class="cell">
+        <div class="label">現在時刻</div>
+        <div class="value" id="nowDisplay">----/--/--\n--:--:--</div>
+      </div>
+      <div class="cell">
+        <div class="label">残時間</div>
+        <div class="value" id="remainDisplay">----/--/--\n--:--:--</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="cell">
+        <div class="label">進行度</div>
+        <div class="value percent" id="percentDisplay">--.-----%</div>
+      </div>
+      <div class="cell">
+        <div class="label">目標日</div>
+        <div class="value" id="targetDateDisplay">----/--/--</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="share-row">
+    <button type="button" class="share-btn" id="copyBtn">
+      <svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+      <span id="copyBtnLabel">コピー（Discordなど用）</span>
+    </button>
+    <button type="button" class="share-btn" id="tweetBtn">
+      <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <span id="tweetBtnLabel">Xに投稿</span>
+    </button>
+  </div>
+
+<script>
+  // ===== カスタマイズ =====
+  const CONFIG = {
+    targetMonth: 4,      // 目標の月（1〜12）
+    targetDay: 24,       // 目標の日
+    labelBefore: "珠乃井ナナ次の誕生日",   // 状態1・2（当日より前）のときの表示テキスト
+    labelDuringDay: "珠乃井ナナ今年の誕生日終了",  // 状態3（当日）のときの表示テキスト
+    updateIntervalMs: 1000, // 更新間隔（ミリ秒）。1000=1秒ごと
+
+    // ここから下がコピー／X投稿ボタンの文面設定。
+    // {label} {seconds} {percent} {targetDate} は自動で置き換わる部分（プレースホルダー）。
+    // 好きな位置に差し込んだり、前後に文章を足したりして自由に書き換えてOK。
+    shareTemplate:
+      "{label}まで あと{seconds}秒\n進行度: {percent}%\n目標日: {targetDate}",
+    // Xは文字数制限があるので短めのテンプレートを別に用意している
+    tweetTemplate:
+      "{label}まで あと{seconds}秒（進行度{percent}%）",
+    // 投稿文の末尾に付けたいハッシュタグ（不要なら空配列 [] にする）
+    tweetHashtags: [],
+    // ツイートにリンクも付けたい場合はURLを入れる（不要なら空文字のまま）
+    tweetUrl: ""
+  };
+  // ===================================================================
+
+  function pad(n, len=2){
+    return String(n).padStart(len, "0");
+  }
+
+  function formatDateTime(d){
+    return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}\n${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  function formatDateOnly(d){
+    return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`;
+  }
+
+  // 残り秒数を「YYYY/MM/DD\nhh:mm:ss」の差分表記っぽく出す（経過期間の内訳表示）
+  function formatDuration(totalSeconds){
+    if (totalSeconds < 0) totalSeconds = 0;
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    // 「年/月/日」的な区切りは意味を持たないので、日数をそのまま出す形にする
+    return `${days}日\n${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  }
+
+  function getTargetForYear(year){
+    return new Date(year, CONFIG.targetMonth - 1, CONFIG.targetDay, 0, 0, 0, 0);
+  }
+
+  // 現在時刻を元に「状態」と「開始時刻・終了時刻・ラベル」を決定する
+  function resolveState(now){
+    const year = now.getFullYear();
+    const thisYearTarget = getTargetForYear(year);
+    const nextDayAfterTarget = new Date(year, CONFIG.targetMonth - 1, CONFIG.targetDay + 1, 0, 0, 0, 0);
+
+    if (now < thisYearTarget){
+      // 状態1: 4/24 0:00 より前
+      return {
+        label: CONFIG.labelBefore,
+        start: null,
+        end: thisYearTarget,
+        totalSpanSeconds: (thisYearTarget - startOfDayBefore(now)) / 1000 // 進行度算出用（下で調整）
+      };
+    } else if (now >= thisYearTarget && now < nextDayAfterTarget){
+      // 状態3: 4/24当日
+      return {
+        label: CONFIG.labelDuringDay,
+        start: thisYearTarget,
+        end: nextDayAfterTarget,
+        totalSpanSeconds: (nextDayAfterTarget - thisYearTarget) / 1000
+      };
+    } else {
+      // 状態2: 4/24を過ぎた（来年の4/24まで）
+      const nextYearTarget = getTargetForYear(year + 1);
+      return {
+        label: CONFIG.labelBefore,
+        start: nextDayAfterTarget,
+        end: nextYearTarget,
+        totalSpanSeconds: (nextYearTarget - nextDayAfterTarget) / 1000
+      };
+    }
+  }
+
+  // 状態1（当日より前）の進行度は「前回の4/24終了時点」から「今回の4/24開始」までを100%とする
+  function startOfDayBefore(now){
+    const year = now.getFullYear();
+    const thisYearTarget = getTargetForYear(year);
+    if (now < thisYearTarget){
+      // 前年の4/25 0:00 を開始点とする
+      return new Date(year - 1, CONFIG.targetMonth - 1, CONFIG.targetDay + 1, 0, 0, 0, 0);
+    }
+    return now;
+  }
+
+  // 直近の tick() の結果を覚えておく箱。ボタンを押した瞬間の値を
+  // シェア文面に使うために、tick() の最後で毎回上書きしている。
+  let lastSnapshot = null;
+
+  function tick(){
+    const now = new Date();
+    const state = resolveState(now);
+
+    const remainMs = state.end - now;
+    const remainSeconds = Math.max(0, remainMs / 1000);
+
+    // メイン表示（切り上げ整数秒）
+    document.getElementById("targetLabel").textContent = state.label;
+    document.getElementById("secondsLeft").textContent = Math.ceil(remainSeconds);
+
+    // 現在時刻
+    document.getElementById("nowDisplay").textContent = formatDateTime(now);
+
+    // 残時間（日/時:分:秒の内訳）
+    document.getElementById("remainDisplay").textContent = formatDuration(remainSeconds);
+
+    // 進行度計算
+    let start = state.start;
+    if (start === null){
+      start = startOfDayBefore(now);
+    }
+    const totalSpan = (state.end - start) / 1000;
+    const elapsed = (now - start) / 1000;
+    let percent = totalSpan > 0 ? (elapsed / totalSpan) * 100 : 100;
+    percent = Math.min(100, Math.max(0, percent));
+
+    document.getElementById("percentDisplay").textContent = percent.toFixed(5) + "%";
+    document.getElementById("targetDateDisplay").textContent = formatDateOnly(state.end);
+    document.getElementById("progressFill").style.width = percent + "%";
+
+    // ボタン用に、いま画面に出しているのと同じ値を保存しておく
+    lastSnapshot = {
+      label: state.label,
+      seconds: Math.ceil(remainSeconds),
+      percent: percent.toFixed(5),
+      targetDate: formatDateOnly(state.end)
+    };
+  }
+
+  // テンプレート文字列の {label} {seconds} {percent} {targetDate} を
+  // 実際の値に置き換えるだけの小さな関数
+  function fillTemplate(template){
+    if (!lastSnapshot) return template;
+    return template
+      .replaceAll("{label}", lastSnapshot.label)
+      .replaceAll("{seconds}", lastSnapshot.seconds)
+      .replaceAll("{percent}", lastSnapshot.percent)
+      .replaceAll("{targetDate}", lastSnapshot.targetDate);
+  }
+
+  // ボタンの表示ラベルを一時的に「コピーしました！」などに変えて、
+  // 1.6秒後に元に戻す共通処理
+  function flashButton(buttonEl, labelEl, message, originalText){
+    buttonEl.classList.add("is-done");
+    labelEl.textContent = message;
+    clearTimeout(buttonEl._flashTimer);
+    buttonEl._flashTimer = setTimeout(() => {
+      buttonEl.classList.remove("is-done");
+      labelEl.textContent = originalText;
+    }, 1600);
+  }
+
+  // Discordなどに貼り付け用のテキストをクリップボードにコピーする
+  async function copyForDiscord(){
+    const text = fillTemplate(CONFIG.shareTemplate);
+    const btn = document.getElementById("copyBtn");
+    const label = document.getElementById("copyBtnLabel");
+    try{
+      await navigator.clipboard.writeText(text);
+      flashButton(btn, label, "コピーしました！", "コピー（Discordなど用）");
+    } catch (err){
+      // クリップボードAPIが使えない環境向けの保険（古いブラウザ等）
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try{
+        document.execCommand("copy");
+        flashButton(btn, label, "コピーしました！", "コピー（Discordなど用）");
+      } catch (err2){
+        flashButton(btn, label, "コピー失敗…", "コピー（Discordなど用）");
+      }
+      document.body.removeChild(textarea);
+    }
+  }
+
+  // Xの投稿画面を新しいタブで開く（投稿自体はユーザーがXの画面で行う）
+  function shareToTwitter(){
+    let text = fillTemplate(CONFIG.tweetTemplate);
+    if (CONFIG.tweetHashtags && CONFIG.tweetHashtags.length > 0){
+      text += " " + CONFIG.tweetHashtags.map(h => h.startsWith("#") ? h : "#" + h).join(" ");
+    }
+    const params = new URLSearchParams({ text: text });
+    if (CONFIG.tweetUrl){
+      params.set("url", CONFIG.tweetUrl);
+    }
+    const intentUrl = "https://twitter.com/intent/tweet?" + params.toString();
+    window.open(intentUrl, "_blank", "noopener,noreferrer");
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", copyForDiscord);
+  document.getElementById("tweetBtn").addEventListener("click", shareToTwitter);
+
+  tick();
+  setInterval(tick, CONFIG.updateIntervalMs);
+</script>
+
+</body>
+</html>
